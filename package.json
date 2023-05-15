@@ -1,0 +1,37 @@
+{
+  "name": "@owly/owly-webflow",
+  "version": "0.1.0",
+  "description": "A set of utilities for Webflow.",
+  "main": "dist/owly-webflow.cjs.js",
+  "module": "dist/owly-webflow.esm.js",
+  "browser": "dist/owly-webflow.umd.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "serve": "http-server ./dist --cors",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "axios": "^1.4.0",
+    "axios-extensions": "^3.1.6",
+    "lru-cache": "^9.1.1"
+  },
+  "devDependencies": {
+    "@rollup/plugin-alias": "^5.0.0",
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.2",
+    "@rollup/plugin-terser": "^0.4.1",
+    "eslint": "^8.40.0",
+    "eslint-config-prettier": "^8.8.0",
+    "http-server": "^14.1.1",
+    "jest": "^29.5.0",
+    "prettier": "^2.8.8",
+    "rollup": "^3.21.7",
+    "rollup-plugin-delete": "^2.0.0",
+    "husky": "^8.0.0"
+  }
+}
