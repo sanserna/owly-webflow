@@ -11,7 +11,7 @@
         endpoints: {
           getProject: {
             method: 'get',
-            uri: '/project/{projectId}'
+            url: '/project/{projectId}'
           }
         }
       }
