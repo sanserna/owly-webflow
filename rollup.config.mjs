@@ -1,6 +1,6 @@
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
-import path from 'node:path';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import path from 'path';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
@@ -17,7 +17,7 @@ const [, pkgName] = pkg.name.split('/');
 const commonPlugins = [
   alias({
     entries: {
-      'owly-webflow-config': path.resolve(__dirname, 'src/config'),
+      '@app-config': path.resolve(__dirname, 'src/config'),
     },
   }),
 ];

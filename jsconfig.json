@@ -1,10 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES6",
-    "allowSyntheticDefaultImports": false,
     "baseUrl": "./src",
     "paths": {
-      "owly-webflow-config/*": ["config/*"],
+      "@app-config/*": ["config/*"],
     }
   },
   "exclude": ["node_modules", "dist"]

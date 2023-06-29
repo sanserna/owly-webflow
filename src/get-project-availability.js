@@ -1,23 +1,25 @@
-import { environment } from 'owly-webflow-config/environment';
-import HttpClient from './http-client';
+import { environment } from '@app-config/environment';
+import createHttpClient from './lib/create-http-client';
 
-const api = Object.keys(environment.apis).reduce((apis, apiName) => {
-  const apiConfig = environment.apis[apiName];
-
-  apis[apiName] = new HttpClient(apiConfig);
-
-  return apis;
-}, {});
+const owlyHttpClient = createHttpClient(environment.apis.owly);
 
 async function getProjectAvailability(options) {
-  const { product, companyCode, projectId, itemCallback } = options;
+  const {
+    product,
+    companyCode,
+    projectId,
+    token,
+    itemCallback,
+    limit = 400,
+  } = options;
 
-  const { status, data } = await api.owly.getProject({
+  const { status, data } = await owlyHttpClient.getProject({
     config: {
       headers: {
         product,
         'company-code': companyCode,
       },
+      params: { limit, token },
     },
     urlParams: {
       projectId,

@@ -1,3 +1,3 @@
-import getProjectAvailability from './lib/get-project-availability';
+import getProjectAvailability from './get-project-availability';
 
 export { getProjectAvailability };
