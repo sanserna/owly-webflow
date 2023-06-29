@@ -1,26 +1,34 @@
-import { readFileSync } from 'fs';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import terser from '@rollup/plugin-terser';
 import alias from '@rollup/plugin-alias';
+import babel from '@rollup/plugin-babel';
 import del from 'rollup-plugin-delete';
+import analyze from 'rollup-plugin-analyzer';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkg = JSON.parse(
   readFileSync(new URL('./package.json', import.meta.url))
 );
 const [, pkgName] = pkg.name.split('/');
+const babelRuntimeVersion = pkg.dependencies['@babel/runtime'].replace(
+  /[^0-9]*/,
+  ''
+);
 
-const commonPlugins = [
-  alias({
-    entries: {
-      '@app-config': path.resolve(__dirname, 'src/config'),
-    },
-  }),
-];
+const makeExternalPredicate = (externalArr) => {
+  if (externalArr.length === 0) {
+    return () => false;
+  }
+  const pattern = new RegExp(`^(${externalArr.join('|')})($|/)`);
+  return (id) => pattern.test(id);
+};
+
 const umdOutputBaseConfig = {
   name: 'owlyWebflow',
   format: 'umd',
@@ -29,62 +37,50 @@ const umdOutputBaseConfig = {
   },
 };
 
-export default [
-  // browser-friendly UMD build
-  {
-    input: 'src/index.js',
-    external: ['axios'],
-    output: [
-      {
-        ...umdOutputBaseConfig,
-        file: `dist/${pkgName}.umd.js`,
-        sourcemap: true,
+export default {
+  input: 'src/index.js',
+  external: makeExternalPredicate([
+    ...Object.keys(pkg.dependencies || {}),
+    ...Object.keys(pkg.peerDependencies || {}),
+  ]),
+  output: [
+    {
+      ...umdOutputBaseConfig,
+      file: `dist/${pkgName}.umd.js`,
+      sourcemap: true,
+    },
+    {
+      ...umdOutputBaseConfig,
+      file: `dist/${pkgName}.umd.min.js`,
+      plugins: [terser()],
+    },
+  ],
+  plugins: [
+    del({
+      targets: 'dist/*',
+    }),
+    alias({
+      entries: {
+        '@app-config': path.resolve(__dirname, 'src/config'),
       },
-      {
-        ...umdOutputBaseConfig,
-        file: `dist/${pkgName}.umd.min.js`,
-        plugins: [terser()],
-      },
-    ],
-    plugins: [
-      ...commonPlugins,
-      del({
-        targets: 'dist/*',
-      }),
-      resolve({
-        browser: true,
-      }),
-      json(),
-      commonjs(),
-    ],
-  },
-
-  // CommonJS (for Node) and ES module (for bundlers) build.
-  // (We could have three entries in the configuration array
-  // instead of two, but it's quicker to generate multiple
-  // builds from a single configuration where possible, using
-  // an array for the `output` option, where we can specify
-  // `file` and `format` for each target)
-  {
-    input: 'src/index.js',
-    external: Object.keys(pkg.dependencies),
-    output: [
-      {
-        file: `dist/${pkgName}.cjs.js`,
-        format: 'cjs',
-      },
-      {
-        file: `dist/${pkgName}.esm.js`,
-        format: 'es',
-      },
-    ],
-    plugins: [
-      ...commonPlugins,
-      resolve({
-        preferBuiltins: true,
-      }),
-      json(),
-      commonjs(),
-    ],
-  },
-];
+    }),
+    resolve({
+      browser: true,
+    }),
+    json(),
+    commonjs({ include: ['node_modules/**'] }),
+    babel({
+      babelHelpers: 'runtime',
+      exclude: /node_modules/,
+      presets: [['@babel/preset-env', { targets: 'defaults' }]],
+      plugins: [
+        ['@babel/plugin-transform-runtime', { version: babelRuntimeVersion }],
+      ],
+    }),
+    analyze({
+      hideDeps: true,
+      limit: 0,
+      summaryOnly: true,
+    }),
+  ],
+};

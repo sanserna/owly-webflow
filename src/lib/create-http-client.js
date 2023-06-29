@@ -18,7 +18,7 @@ function composeUrl(url, params = {}) {
   return url;
 }
 
-export default function createHttpClient({
+function createHttpClient({
   baseURL,
   headers = {},
   endpoints = {},
@@ -27,19 +27,21 @@ export default function createHttpClient({
   const axiosInstance = axios.create({ baseURL, headers, timeout });
   const httpClient = {};
 
-  Object.keys(endpoints).forEach((endpointName) => {
-    const { url, method } = endpoints[endpointName];
+  Object.entries(endpoints).forEach(([endpointName, options]) => {
+    const { url, method } = options;
 
     httpClient[endpointName] = ({ urlParams, config = {}, data = {} } = {}) => {
       const composedUrl = composeUrl(url, urlParams);
 
-      let apiCall = axiosInstance[method](composedUrl, data, config);
-
       if (['get', 'delete', 'head', 'options'].includes(method)) {
-        apiCall = axiosInstance[method](composedUrl, config);
+        return axiosInstance[method](composedUrl, config);
       }
 
-      return apiCall;
+      return axiosInstance[method](composedUrl, data, config);
     };
   });
+
+  return httpClient;
 }
+
+export default createHttpClient;
