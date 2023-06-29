@@ -11,88 +11,92 @@
         endpoints: {
           getProject: {
             method: 'get',
-            uri: '/project/{projectId}',
-          },
-        },
-      },
-    },
+            uri: '/project/{projectId}'
+          }
+        }
+      }
+    }
   };
 
-  // Uri params interpolation
-  function getURI(uri, params = {}) {
-    const matches = uri.match(/\{([a-zA-Z0-9_]+)}/g);
-
+  function composeUrl(url) {
+    let params = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+    const matches = url.match(/\{([a-zA-Z0-9_]+)}/g);
     if (matches) {
-      let parsedUri = uri;
-
-      matches.forEach((match) => {
+      let parsedUrl = url;
+      matches.forEach(match => {
         const name = match.replace(/{?}?/g, '');
-
-        parsedUri = parsedUri.replace(match, params[name] || '');
+        parsedUrl = parsedUrl.replace(match, params[name] || '');
       });
-
-      return parsedUri;
+      return parsedUrl;
     }
-
-    return uri;
+    return url;
+  }
+  function createHttpClient(_ref) {
+    let {
+      baseURL,
+      headers = {},
+      endpoints = {},
+      timeout = 30000
+    } = _ref;
+    const axiosInstance = axios.create({
+      baseURL,
+      headers,
+      timeout
+    });
+    const httpClient = {};
+    Object.entries(endpoints).forEach(_ref2 => {
+      let [endpointName, options] = _ref2;
+      const {
+        url,
+        method
+      } = options;
+      httpClient[endpointName] = function () {
+        let {
+          urlParams,
+          config = {},
+          data = {}
+        } = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+        const composedUrl = composeUrl(url, urlParams);
+        if (['get', 'delete', 'head', 'options'].includes(method)) {
+          return axiosInstance[method](composedUrl, config);
+        }
+        return axiosInstance[method](composedUrl, data, config);
+      };
+    });
+    return httpClient;
   }
 
-  class HttpClient {
-    constructor({ baseURL, headers, endpoints = {}, timeout = 30000 }) {
-      this.client = axios.create({ baseURL, headers, timeout });
-
-      Object.keys(endpoints).forEach((endpointName) => {
-        const { uri, method } = endpoints[endpointName];
-
-        this[endpointName] = ({ urlParams, config = {}, data = {} } = {}) => {
-          const composedUri = getURI(uri, urlParams);
-          const abortController = new AbortController();
-          const requestConfig = {
-            ...config,
-            signal: abortController.signal,
-          };
-
-          let apiCall;
-
-          if (['get', 'delete', 'head', 'options'].includes(method)) {
-            apiCall = this.client[method](composedUri, requestConfig);
-          } else {
-            apiCall = this.client[method](composedUri, data, requestConfig);
-          }
-
-          apiCall.abort = () => abortController.abort();
-
-          return apiCall;
-        };
-      });
-    }
-  }
-
-  const api = Object.keys(environment.apis).reduce((apis, apiName) => {
-    const apiConfig = environment.apis[apiName];
-
-    apis[apiName] = new HttpClient(apiConfig);
-
-    return apis;
-  }, {});
-
+  const owlyHttpClient = createHttpClient(environment.apis.owly);
   async function getProjectAvailability(options) {
-    const { product, companyCode, projectId, itemCallback } = options;
-
-    const { status, data } = await api.owly.getProject({
+    var _data$items;
+    const {
+      product,
+      companyCode,
+      projectId,
+      token,
+      itemCallback,
+      limit = 400
+    } = options;
+    const {
+      status,
+      data
+    } = await owlyHttpClient.getProject({
       config: {
         headers: {
           product,
-          'company-code': companyCode,
+          'company-code': companyCode
         },
+        params: {
+          limit,
+          token
+        }
       },
       urlParams: {
-        projectId,
-      },
+        projectId
+      }
     });
-
-    if (status === 200 && data.items?.length) {
-      data.items.forEach((item) => {
+    if (status === 200 && (_data$items = data.items) !== null && _data$items !== void 0 && _data$items.length) {
+      data.items.forEach(item => {
         if (itemCallback && typeof itemCallback === 'function') {
           itemCallback(item);
         }
