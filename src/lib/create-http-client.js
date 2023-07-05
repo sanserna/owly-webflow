@@ -18,6 +18,35 @@ function composeUrl(url, params = {}) {
   return url;
 }
 
+/**
+ * Endpoint call options
+ * @typedef {Object} EndpointCallOptions
+ * @property {Object} [urlParams] - params used to compose the API url
+ * @property {RequestConfig} [config] - axios config
+ * @property {Object} [data] - data
+ */
+
+/**
+ * @typedef {import('axios').AxiosRequestConfig} RequestConfig
+ * @typedef {import('axios').AxiosResponse} Response
+ * @callback EndpointCallFn
+ * @param {EndpointCallOptions} [options] - endpoint call options
+ * @returns {Promise<Response>}
+ */
+
+/**
+ * Create http client
+ * @typedef {{
+ *   method: ('get'|'post'|'delete'|'head'|'options')
+ *   url: string
+ * }} EndpointConfig
+ * @param {Object} options - http client config options
+ * @param {string} options.baseURL - the server URL that will be used for the request
+ * @param {Object<string, string>} [options.headers={}] - custom headers to be sent
+ * @param {Object<string, EndpointConfig>} [options.endpoints={}] - endpoints config
+ * @param {number} [options.timeout=30000] - the number of milliseconds before the request times out
+ * @returns {Object<string, EndpointCallFn>}
+ */
 function createHttpClient({
   baseURL,
   headers = {},

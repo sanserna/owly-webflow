@@ -1,7 +1,4 @@
-import { environment } from '@app-config/environment';
-import createHttpClient from './lib/create-http-client';
-
-const owlyHttpClient = createHttpClient(environment.apis.owly);
+import { owlyApiHttpClient } from './owly-api-http-client';
 
 async function getProjectAvailability(options) {
   const {
@@ -13,13 +10,14 @@ async function getProjectAvailability(options) {
     limit = 400,
   } = options;
 
-  const { status, data } = await owlyHttpClient.getProject({
+  const { status, data } = await owlyApiHttpClient.getProject({
     config: {
-      headers: {
+      params: {
         product,
-        'company-code': companyCode,
+        companyCode,
+        limit,
+        token,
       },
-      params: { limit, token },
     },
     urlParams: {
       projectId,
