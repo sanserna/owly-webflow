@@ -16,14 +16,19 @@
   "settings": {
     "import/resolver": {
       "alias": {
-        "map": [
-          ["@app-config", "./src/config"]
-        ],
+        "map": [],
         "extensions": [".js", ".json"]
       }
     }
   },
   "plugins": [],
   "ignorePatterns": ["dist/**/*.js"],
-  "rules": {}
+  "overrides": [
+    {
+      "files": ["rollup.config.mjs"],
+      "rules": {
+        "import/no-unresolved": "off"
+      }
+    }
+  ]
 }

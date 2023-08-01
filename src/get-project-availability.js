@@ -1,6 +1,6 @@
 import { owlyApiHttpClient } from './owly-api-http-client';
 
-async function getProjectAvailability(options) {
+export default async function getProjectAvailability(options) {
   const {
     product,
     companyCode,
@@ -32,5 +32,3 @@ async function getProjectAvailability(options) {
     });
   }
 }
-
-export default getProjectAvailability;

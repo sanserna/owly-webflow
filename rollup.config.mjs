@@ -34,6 +34,7 @@ const umdOutputBaseConfig = {
   format: 'umd',
   globals: {
     axios: 'axios',
+    parsleyjs: 'parsley',
   },
 };
 
@@ -60,9 +61,7 @@ export default {
       targets: 'dist/*',
     }),
     alias({
-      entries: {
-        '@app-config': path.resolve(__dirname, 'src/config'),
-      },
+      entries: {},
     }),
     resolve({
       browser: true,
