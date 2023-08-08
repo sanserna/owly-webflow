@@ -105,7 +105,7 @@
   });
 
   async function getProjectAvailability(options) {
-    var _data$items;
+    var _project$items;
     const {
       product,
       companyCode,
@@ -130,8 +130,11 @@
         projectId
       }
     });
-    if (status === 200 && (_data$items = data.items) !== null && _data$items !== void 0 && _data$items.length) {
-      data.items.forEach(item => {
+    const {
+      project
+    } = data;
+    if (status === 200 && (_project$items = project.items) !== null && _project$items !== void 0 && _project$items.length) {
+      project.items.forEach(item => {
         if (itemCallback && typeof itemCallback === 'function') {
           itemCallback(item);
         }
