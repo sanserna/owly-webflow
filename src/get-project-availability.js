@@ -23,9 +23,10 @@ export default async function getProjectAvailability(options) {
       projectId,
     },
   });
+  const { project } = data;
 
-  if (status === 200 && data.items?.length) {
-    data.items.forEach((item) => {
+  if (status === 200 && project.items?.length) {
+    project.items.forEach((item) => {
       if (itemCallback && typeof itemCallback === 'function') {
         itemCallback(item);
       }
