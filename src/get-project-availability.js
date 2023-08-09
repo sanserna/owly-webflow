@@ -25,10 +25,10 @@ export default async function getProjectAvailability(options) {
   });
   const { project } = data;
 
-  if (status === 200 && project.items?.length) {
-    project.items.forEach((item) => {
+  if (status === 200 && project.units?.length) {
+    project.units.forEach((unit) => {
       if (itemCallback && typeof itemCallback === 'function') {
-        itemCallback(item);
+        itemCallback(unit);
       }
     });
   }
