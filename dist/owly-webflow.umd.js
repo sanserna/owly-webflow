@@ -105,7 +105,7 @@
   });
 
   async function getProjectAvailability(options) {
-    var _project$items;
+    var _project$units;
     const {
       product,
       companyCode,
@@ -133,10 +133,10 @@
     const {
       project
     } = data;
-    if (status === 200 && (_project$items = project.items) !== null && _project$items !== void 0 && _project$items.length) {
-      project.items.forEach(item => {
+    if (status === 200 && (_project$units = project.units) !== null && _project$units !== void 0 && _project$units.length) {
+      project.units.forEach(unit => {
         if (itemCallback && typeof itemCallback === 'function') {
-          itemCallback(item);
+          itemCallback(unit);
         }
       });
     }
