@@ -4,6 +4,7 @@ import createHttpClient from './lib/create-http-client';
  * @typedef {import('./lib/create-http-client').EndpointCallFn} EndpointCallFn
  * @typedef {Object} OwlyHttpClient
  * @property {EndpointCallFn} getProject
+ * @property {EndpointCallFn} getProjectTower
  * @property {EndpointCallFn} createLead
  */
 
@@ -15,6 +16,10 @@ export const owlyApiHttpClient = createHttpClient({
       method: 'get',
       url: '/projects/{projectId}',
     },
+	getProjectTower: {
+	  method: 'get',
+      url: '/projects/{projectId}/{towerId}',
+	},
     createLead: {
       method: 'post',
       url: '/leads/',
