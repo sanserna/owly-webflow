@@ -18,7 +18,7 @@ export const owlyApiHttpClient = createHttpClient({
     },
 	getProjectTower: {
 	  method: 'get',
-      url: '/projects/{projectId}/{towerId}',
+      url: '/projects/{projectId}/towers/{towerId}',
 	},
     createLead: {
       method: 'post',
