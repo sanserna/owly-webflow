@@ -4,23 +4,23 @@ export default async function getProjectAvailability(options) {
   const {
     product,
     companyCode,
-    projectId,
-    projectSlug, // Agregado para Alterestate
+    projectId,  // Usado para todos los productos. En Alterestate, projectId es el slug.
     token,
     itemCallback,
     limit = 400,
   } = options;
 
-  // Construye los parámetros según el producto:
-  // - Para Alterestate se utiliza projectSlug.
-  // - Para los demás productos se usan companyCode y projectId.
-  const params = product === 'alterestate'
-    ? { product, projectSlug, limit, token }
-    : { product, companyCode, limit, token };
+  // Construye los parámetros comunes.
+  // Para productos distintos a alterestate, se incluye companyCode.
+  const params = {
+    product,
+    limit,
+    token,
+    ...(product !== 'alterestate' && { companyCode }),
+  };
 
-  const urlParams = product === 'alterestate'
-    ? { projectSlug }
-    : { projectId };
+  // Siempre usamos projectId en la URL.
+  const urlParams = { projectId };
 
   const { status, data } = await owlyApiHttpClient.getProject({
     config: { params },
